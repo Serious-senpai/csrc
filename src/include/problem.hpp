@@ -4,12 +4,18 @@
 
 namespace csrc
 {
+    enum ContainerType
+    {
+        CONTAINER_20 = 20,
+        CONTAINER_40 = 40,
+    };
+
     class Request
     {
     private:
         Request(
             const std::size_t &id,
-            const int &size,
+            const ContainerType &size,
             const std::size_t &pickup,
             const std::size_t &drop,
             const bool &pickup_trailer,
@@ -30,7 +36,7 @@ namespace csrc
         const std::size_t id;
 
         // Size of container, either 20 or 40
-        const int size;
+        const ContainerType size;
 
         // Pickup and drop locations
         const std::size_t pickup, drop;
@@ -73,7 +79,7 @@ namespace csrc
 
         return new Request(
             id,
-            size,
+            size == 20 ? CONTAINER_20 : CONTAINER_40,
             pickup,
             drop,
             pickup_action == "PICKUP_CONTAINER_TRAILER",
