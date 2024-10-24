@@ -1,6 +1,7 @@
-#include <standard.hpp>
+#include <problem.hpp>
 
 int main()
 {
-    std::cout << "Hello world!" << std::endl;
+    csrc::Problem::read();
+    return 0;
 }

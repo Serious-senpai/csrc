@@ -7,47 +7,32 @@ ROOT_DIR=$(realpath $SCRIPT_DIR/..)
 echo "Got root of directory: $ROOT_DIR"
 mkdir -p $ROOT_DIR/build
 
-if [ "$1" == "alglib" ]
+echo "Building main.exe"
+params="-Wall -I src/include -D LOGGING -std=c++20"
+if [ "$1" == "debug" ]
 then
-    echo "Building ALGLIB"
-
-    #! https://stackoverflow.com/a/9612560
-    find $ROOT_DIR/extern/alglib-cpp/src/*.cpp -print0 | while read -d $'\0' file
-    do
-        command="g++ -c -O3 -D AE_CPU=AE_INTEL -mavx2 -mfma -std=c++20 $file -o $ROOT_DIR/build/$(basename ${file%.cpp}).o"
-        echo "Running \"$command\""
-        $command
-    done
+    params="$params -g -D DEBUG"
+    echo "Building in debug mode"
 
 else
-    echo "Building main.exe"
-    params="-Wall -I src/include -I extern/alglib-cpp/src -D LOGGING -std=c++20"
-    if [ "$1" == "debug" ]
+    params="$params -O3"
+    if [ "$1" == "profile-generate" ]
     then
-        params="$params -g -D DEBUG"
-        echo "Building in debug mode"
+        params="$params -fprofile-generate"
+        echo "Building in profile mode"
+
+    elif [ "$1" == "profile-use" ]
+    then
+        params="$params -fprofile-use"
+        echo "Building using generated profile data"
 
     else
-        params="$params -O3"
-        if [ "$1" == "profile-generate" ]
-        then
-            params="$params -fprofile-generate"
-            echo "Building in profile mode"
-
-        elif [ "$1" == "profile-use" ]
-        then
-            params="$params -fprofile-use"
-            echo "Building using generated profile data"
-
-        else
-            echo "Building normally"
-
-        fi
+        echo "Building normally"
 
     fi
 
-    command="g++ $params $ROOT_DIR/src/main.cpp $ROOT_DIR/build/*.o -o $ROOT_DIR/build/main.exe"
-    echo "Running \"$command\""
-    $command
-
 fi
+
+command="g++ $params $ROOT_DIR/src/main.cpp -o $ROOT_DIR/build/main.exe"
+echo "Running \"$command\""
+$command
