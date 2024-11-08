@@ -15,25 +15,6 @@ namespace csrc
 
     class Request
     {
-    private:
-        Request(
-            const std::size_t &id,
-            const ContainerType &size,
-            const std::size_t &pickup,
-            const std::size_t &drop,
-            const bool &pickup_trailer,
-            const bool &drop_trailer,
-            const int &pickup_duration,
-            const int &drop_duration)
-            : id(id),
-              size(size),
-              pickup(pickup),
-              drop(drop),
-              pickup_trailer(pickup_trailer),
-              drop_trailer(drop_trailer),
-              pickup_duration(pickup_duration),
-              drop_duration(drop_duration) {}
-
     public:
         /** @brief Request ID */
         const std::size_t id;
@@ -52,6 +33,24 @@ namespace csrc
 
         /** @brief Read data from stdin */
         static std::shared_ptr<Request> read();
+
+        Request(
+            const std::size_t &id,
+            const ContainerType &size,
+            const std::size_t &pickup,
+            const std::size_t &drop,
+            const bool &pickup_trailer,
+            const bool &drop_trailer,
+            const int &pickup_duration,
+            const int &drop_duration)
+            : id(id),
+              size(size),
+              pickup(pickup),
+              drop(drop),
+              pickup_trailer(pickup_trailer),
+              drop_trailer(drop_trailer),
+              pickup_duration(pickup_duration),
+              drop_duration(drop_duration) {}
     };
 
     std::shared_ptr<Request> Request::read()
@@ -100,29 +99,7 @@ namespace csrc
             const std::size_t &trailer_depot,
             const int &trailer_pickup_time,
             const std::vector<std::size_t> &depots,
-            const std::vector<Request *> &requests);
-
-        Config(
-            const std::size_t &size,
-            const std::vector<std::vector<int>> &distances,
-            const std::size_t &trailer_depot,
-            const int &trailer_pickup_time,
-            const std::vector<std::size_t> &depots,
-            const std::vector<Request *> &requests)
-            : size(size),
-              distances(distances),
-              trailer_depot(trailer_depot),
-              trailer_pickup_time(trailer_pickup_time),
-              depots(depots),
-              requests(requests),
-              vrp_matrix(
-                  _calculate_vrp_matrix(
-                      size,
-                      distances,
-                      trailer_depot,
-                      trailer_pickup_time,
-                      depots,
-                      requests)) {}
+            const std::vector<std::shared_ptr<Request>> &requests);
 
     public:
         static std::shared_ptr<Config> instance;
@@ -143,7 +120,7 @@ namespace csrc
         const std::vector<std::size_t> depots;
 
         /** @brief List of requests */
-        const std::vector<Request *> requests;
+        const std::vector<std::shared_ptr<Request>> requests;
 
         /**
          * @brief The travel time matrix of the MDVRP problem that the original problem reduced to.
@@ -152,6 +129,28 @@ namespace csrc
          * points are the requests and the last `depots.size()` points are the truck depots.
          */
         const std::vector<std::vector<int>> vrp_matrix;
+
+        Config(
+            const std::size_t &size,
+            const std::vector<std::vector<int>> &distances,
+            const std::size_t &trailer_depot,
+            const int &trailer_pickup_time,
+            const std::vector<std::size_t> &depots,
+            const std::vector<std::shared_ptr<Request>> &requests)
+            : size(size),
+              distances(distances),
+              trailer_depot(trailer_depot),
+              trailer_pickup_time(trailer_pickup_time),
+              depots(depots),
+              requests(requests),
+              vrp_matrix(
+                  _calculate_vrp_matrix(
+                      size,
+                      distances,
+                      trailer_depot,
+                      trailer_pickup_time,
+                      depots,
+                      requests)) {}
 
         /** @brief Read data from stdin */
         static void read();
@@ -165,7 +164,7 @@ namespace csrc
         const std::size_t &trailer_depot,
         const int &trailer_pickup_time,
         const std::vector<std::size_t> &depots,
-        const std::vector<Request *> &requests)
+        const std::vector<std::shared_ptr<Request>> &requests)
     {
         std::size_t vrp_size = requests.size() + depots.size();
         std::vector<std::vector<int>> vrp_matrix(vrp_size, std::vector<int>(vrp_size));
