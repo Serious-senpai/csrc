@@ -1,7 +1,7 @@
-#include <problem.hpp>
+#include <config.hpp>
 
 int main()
 {
-    csrc::Problem::read();
+    csrc::Config::read();
     return 0;
 }
